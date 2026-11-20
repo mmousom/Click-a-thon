@@ -17,13 +17,22 @@
   let timerId = null;
 
   function loadHighScore() {
-    const raw = localStorage.getItem(HIGH_SCORE_KEY);
-    const value = raw ? Number(raw) : 0;
-    return Number.isFinite(value) ? value : 0;
+    try {
+      const raw = localStorage.getItem(HIGH_SCORE_KEY);
+      const value = raw ? Number(raw) : 0;
+      return Number.isFinite(value) ? value : 0;
+    } catch (e) {
+      // Could not get from localStorage (e.g. security restrictions)
+      return 0;
+    }
   }
 
   function saveHighScore(value) {
-    localStorage.setItem(HIGH_SCORE_KEY, String(value));
+    try {
+      localStorage.setItem(HIGH_SCORE_KEY, String(value));
+    } catch (e) {
+      // Could not save to localStorage
+    }
   }
 
   function setStatus(msg) {
@@ -75,7 +84,6 @@
     score = 0;
     timeLeft = DEFAULT_TIME_SECONDS;
     isRunning = true;
-
     setStatus("Go! Click the button!");
     stopTimer();
     timerId = setInterval(tick, 1000);
@@ -84,7 +92,6 @@
 
   function resetGame() {
     //localStorage.setItem(HIGH_SCORE_KEY, "0"); // Removed to retain high score on reset
-    
 
     isRunning = false;
     stopTimer();
