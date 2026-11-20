@@ -83,7 +83,7 @@
   }
 
   function resetGame() {
-    localStorage.setItem(HIGH_SCORE_KEY, "0"); // Removed to retain high score on reset
+    //localStorage.setItem(HIGH_SCORE_KEY, "0"); // Removed to retain high score on reset
     
 
     isRunning = false;
