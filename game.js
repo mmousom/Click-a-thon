@@ -91,18 +91,19 @@
   }
 
   function resetGame() {
-    localStorage.setItem(HIGH_SCORE_KEY, "0"); // Removed to retain high score on reset
+    // localStorage.setItem(HIGH_SCORE_KEY, "0"); // Removed to retain high score on reset
 
     isRunning = false;
     stopTimer();
-    score = 0;
+    score = 0
+
     timeLeft = DEFAULT_TIME_SECONDS;
     setStatus("Press Start to begin.");
     render();
   }
 
   function onClick() {
-    if (!isRunning || timeLeft <= 0) return;
+    if (!isRunning ||  timeLeft <= 0) return;
     score += 2;
     render();
   }
