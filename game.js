@@ -62,7 +62,7 @@
       saveHighScore(score);
       setStatus(`Time! New high score: ${score} `);
     } else {
-      setStatus(`time! Final score: ${score}. Try again!`);
+      setStatus(`Time! Final score: ${score}. Try again!`);
     }
     render();
   }
@@ -70,7 +70,7 @@
   function tick() {
     if (!isRunning) return;
 
-    timeLeft--;
+    timeLeft -= 1;
     if (timeLeft <= 0) {
       timeLeft = 0;
       render();
@@ -113,4 +113,4 @@
 
   render();
 
-})()
+})();
