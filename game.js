@@ -1,4 +1,4 @@
-(function() {
+() => {
   const DEFAULT_TIME_SECONDS = 5; // 5 seconds
   const HIGH_SCORE_KEY = "clickathon_high_score_v1";
 
@@ -49,7 +49,7 @@
   }
 
   function stopTimer() {
-     if (timerId) clearInterval(timerId);
+    if (timerId) clearInterval(timerId);
     timerId = null;
   }
 
@@ -68,8 +68,42 @@
   }
 
   function tick() {
-    if (!isRunning ||  timeLeft <= 0) return;
-    score -= 2;
+    if (!isRunning) return;
+
+    timeLeft -= 1;
+    if (timeLeft <= 0) {
+      timeLeft = 0;
+      render();
+      endGame();
+      return;
+    }
+    render();
+  }
+
+  function startGame() {
+    score = 0;
+    timeLeft = DEFAULT_TIME_SECONDS;
+    isRunning = true;
+    setStatus("Go! Click the button!!");
+    stopTimer();
+    timerId = setInterval(tick, 1000);
+    render();
+  }
+
+  function resetGame() {
+    saveHighScore(score); // Save current high score before reset
+    isRunning = false;
+    stopTimer();
+    score = 0;
+
+    timeLeft = DEFAULT_TIME_SECONDS;
+    setStatus("Press Start to begin.");
+    render();
+  }
+
+  function onClick() {
+    if (!isRunning || timeLeft <= 0) return;
+    score += 2;
     render();
   }
 
@@ -78,5 +112,4 @@
   clickBtn.addEventListener("click", onClick);
 
   render();
-
-})();
+}
