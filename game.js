@@ -14,7 +14,6 @@ let timeLeft = DEFAULT_TIME_SECONDS;
 let score = 0;
 let isRunning = false;
 let timerId = null;
-let backgroundColor = 'green';
 
 function loadHighScore() {
   try {
@@ -22,6 +21,7 @@ function loadHighScore() {
     const value = raw ? Number(raw) : 0;
     return Number.isFinite(value) ? value : 0;
   } catch (e) {
+    // Could not get from localStorage (e.g. security restrictions)
     return 0;
   }
 }
@@ -29,62 +29,89 @@ function loadHighScore() {
 function saveHighScore(value) {
   try {
     localStorage.setItem(HIGH_SCORE_KEY, String(value));
-  } catch (e) {}
+  } catch (e) {
+    // Could not save to localStorage
+  }
 }
 
-let highScore = loadHighScore();
-
-function startGame() {
-  if (isRunning) return;
-  timeLeft = DEFAULT_TIME_SECONDS;
-  score = 0;
-  isRunning = true;
-  backgroundColor = 'green';
-  render();
-  timerId = setInterval(() => {
-    timeLeft--;
-    if (timeLeft <= 0) {
-      stopGame();
-    }
-    render();
-  }, 1000);
+function setStatus(msg) {
+  statusEl.textContent = msg;
 }
 
-function stopGame() {
+function getBackgroundColor() {
+  // Change to magenta if score >= 10, else green
+  return score >= 10 ? 'magenta' : 'green';
+}
+
+function render() {
+  timeEl.textContent = String(timeLeft).padStart(2, "0");
+  scoreEl.textContent = String(score);
+  highScoreEl.textContent = String(loadHighScore());
+
+  document.body.style.backgroundColor = getBackgroundColor();
+
+  startBtn.disabled = isRunning;
+  clickBtn.disabled = !isRunning || timeLeft <= 0;
+}
+
+function stopTimer() {
+  if (timerId) clearInterval(timerId);
+  timerId = null;
+}
+
+function endGame() {
   isRunning = false;
-  clearInterval(timerId);
+  stopTimer();
+
+  const highScore = loadHighScore();
   if (score > highScore) {
-    highScore = score;
-    saveHighScore(highScore);
-    backgroundColor = 'magenta';
+    saveHighScore(score);
+    setStatus(`Time! New high score: ${score} a`);
+  } else {
+    setStatus(`Time! Final score: ${score}. Try again!`);
+  }
+
+  render();
+}
+
+function tick() {
+  if (!isRunning) return;
+
+  timeLeft -= 1;
+  if (timeLeft <= 0) {
+    timeLeft = 0;
+    render();
+    endGame();
+    return;
   }
   render();
 }
 
-function resetGame() {
-  isRunning = false;
-  timeLeft = DEFAULT_TIME_SECONDS;
+function startGame() {
   score = 0;
-  backgroundColor = 'green';
-  clearInterval(timerId);
+  timeLeft = DEFAULT_TIME_SECONDS;
+  isRunning = true;
+  setStatus("Go! Click the button!!");
+  document.body.style.backgroundColor = getBackgroundColor();
+  timerId = setInterval(tick, 1000);
+  render();
+}
+
+function resetGame() {
+  saveHighScore(score); // Save current high score before reset
+  isRunning = false;
+  stopTimer();
+  score = 0;
+
+  timeLeft = DEFAULT_TIME_SECONDS;
+  setStatus("Press Start to begin.");
   render();
 }
 
 function onClick() {
-  if (!isRunning) return;
-  score++;
+  if (!isRunning || timeLeft <= 0) return;
+  score += 2;
   render();
-}
-
-function render() {
-  timeEl.textContent = `${timeLeft}`;
-  scoreEl.textContent = `${score}`;
-  highScoreEl.textContent = `${highScore}`;
-  statusEl.textContent = isRunning ? "Game in progress!" : "Click 'Start' to play.";
-  document.body.style.backgroundColor = backgroundColor;
-  startBtn.disabled = isRunning;
-  resetBtn.disabled = !isRunning && score === 0;
-  clickBtn.disabled = !isRunning;
 }
 
 startBtn.addEventListener("click", startGame);
