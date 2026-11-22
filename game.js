@@ -1,4 +1,4 @@
-() => {
+(K) => {
   const DEFAULT_TIME_SECONDS = 5; // 5 seconds
   const HIGH_SCORE_KEY = "clickathon_high_score_v1";
 
@@ -88,6 +88,9 @@
     stopTimer();
     timerId = setInterval(tick, 1000);
     render();
+
+    // Added to fix Issue #11 - change background color to green when game starts
+    document.body.style.backgroundColor = 'green';
   }
 
   function resetGame() {
